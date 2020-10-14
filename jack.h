@@ -6,8 +6,6 @@ enum {
   MSG_SIZE = 3,
   /* valid MIDI notes 0-127 */
   MAX_MIDI_NOTE = 127,
-  MAX_OCTAVE = 10,
-  MIN_OCTAVE = 0,
   MAX_VELOCITY = 127,
   MIN_VELOCITY = 0
 };

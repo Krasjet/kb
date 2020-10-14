@@ -1,4 +1,15 @@
-/* config file for kb, it will be pasted to kb.c during compilation */
+/* config.def.h: config file for kb, it will be pasted to kb.c during
+ * compilation */
+
+/*
+ * Change this to set the maximum and minimum octave of note C.
+ *
+ * Current MIDI range: 0 - 120
+ */
+enum {
+  MAX_OCTAVE = 10,
+  MIN_OCTAVE = 0,
+};
 
 /*
  * The keybindings for kb.
@@ -24,7 +35,7 @@ struct SymBind {
 /* Change keybindings here */
 static struct SymBind symbinds[] = {
  /* key              opcode */
-  { XK_A,            OP_C            },
+  { XK_A,            OP_C            }, /* <- octave above refers to this note */
   { XK_S,            OP_D            },
   { XK_D,            OP_E            },
   { XK_F,            OP_F            },
