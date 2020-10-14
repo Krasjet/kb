@@ -11,9 +11,6 @@
 /* load config */
 #include "config.h"
 
-static char pressed[MAX_KEYCODE + 1] = { 0 };
-static int octave = 5 /* counting from midi 0, 0 <= octave <=10 */;
-static Display *dpy;
 static volatile int running = 0;
 
 /* i.e. the only way to properly shutdown the daemon */
@@ -33,10 +30,13 @@ usage(const char *name) {
 int
 main(int argc, char *argv[])
 {
+  Display *dpy;
   XEvent event;
   int note;
   KeyCode keycode;
   int channel = 0;
+  char pressed[MAX_KEYCODE + 1] = { 0 };
+  int octave = 5; /* counting from midi 0, 0 <= octave <=10 */
 
   int c;
 	while ((c = getopt(argc, argv, "c:")) != -1) {
