@@ -1,8 +1,10 @@
 .POSIX:
 
-PREFIX = /usr/local
-CFLAGS = -Wall -Wextra -std=c99 -g3 -pedantic -Os
-LDLIBS = -lX11 -ljack
+# you might need to customize the flags for your system
+PREFIX  = /usr/local
+CFLAGS  = -Wall -Wextra -std=c99 -pedantic -Os
+LDLIBS  = -lX11 -ljack
+LDFLAGS =
 
 SRC = kb.c jack.c x.c util.c
 OBJ = ${SRC:.c=.o}
