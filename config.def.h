@@ -38,7 +38,7 @@ static struct SymBind symbinds[] = {
   { XK_U,            OP_ASHARP       },
   { XK_K,            OP_C      + 12  }, /* next octave */
   { XK_L,            OP_D      + 12  },
-  { XK_comma,        OP_E      + 12  },
+  { XK_semicolon,    OP_E      + 12  },
   { XK_apostrophe,   OP_F      + 12  },
   { XK_O,            OP_CSHARP + 12  },
   { XK_P,            OP_DSHARP + 12  },
