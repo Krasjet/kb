@@ -26,4 +26,11 @@ clean:
 nuke: clean
 	rm -f config.h
 
-.PHONY: run clean nuke
+install: kb
+	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	install -m 755 kb $(DESTDIR)$(PREFIX)/bin
+
+uninstall:
+	rm -f $(DESTDIR)$(PREFIX)/bin/fretl
+
+.PHONY: run clean nuke install uninstall
