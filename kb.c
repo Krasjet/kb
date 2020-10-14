@@ -37,6 +37,7 @@ main(int argc, char *argv[])
   int channel = 0;
   char pressed[MAX_KEYCODE + 1] = { 0 };
   int octave = 5; /* counting from midi 0, 0 <= octave <=10 */
+  int velocity = 64;
 
   int c;
 	while ((c = getopt(argc, argv, "c:")) != -1) {
@@ -81,7 +82,7 @@ main(int argc, char *argv[])
         /* play note */
         note = octave * 12 + keybinds[keycode];
         if (note <= MAX_MIDI_NOTE)
-          write_note_on(channel, note);
+          write_note_on(channel, note, velocity);
       } else {
         /* opeartions */
         switch (keybinds[keycode]) {
@@ -92,6 +93,18 @@ main(int argc, char *argv[])
         case OP_DEC_OCTAVE:
           if (octave > MIN_OCTAVE)
             octave--;
+          break;
+        case OP_INC_VELOCITY:
+          if (velocity + 10 <= MAX_VELOCITY)
+            velocity += 10;
+          else
+            velocity = MAX_VELOCITY;
+          break;
+        case OP_DEC_VELOCITY:
+          if (velocity - 10 >= MIN_VELOCITY)
+            velocity -= 10;
+          else
+            velocity = MIN_VELOCITY;
           break;
         default: break;
         }
@@ -110,7 +123,7 @@ main(int argc, char *argv[])
 
         note = octave * 12 + keybinds[keycode];
         if (keybinds[keycode] >= 0 && note <= MAX_MIDI_NOTE) {
-          write_note_off(channel, note);
+          write_note_off(channel, note, velocity);
         }
       }
       break;

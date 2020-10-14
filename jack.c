@@ -47,15 +47,15 @@ shutdown_cb(void *arg)
   die("jack server is down, exiting...");
 }
 
-int
-write_note_on(char channel, char pitch) {
+static int
+write_midi(char *msg, size_t size)
+{
   size_t avail_write = jack_ringbuffer_write_space(buffer);
-  char msg[] = { 0x90 | channel, pitch, 0x40 }; /* for now, we fix vel at 64 */
 
-  if (avail_write < sizeof(msg)) {
+  if (avail_write < size) {
     return 0; /* no space left */
   }
-  if (jack_ringbuffer_write(buffer, msg, sizeof(msg)) < sizeof(msg)) {
+  if (jack_ringbuffer_write(buffer, msg, size) < size) {
     return 0; /* write failed */
   }
 
@@ -63,18 +63,13 @@ write_note_on(char channel, char pitch) {
 }
 
 int
-write_note_off(char channel, char pitch) {
-  size_t avail_write = jack_ringbuffer_write_space(buffer);
-  char msg[] = { 0x80 | channel, pitch, 0x40 }; /* for now, we fix vel at 64 */
+write_note_on(char channel, char pitch, char vel) {
+  return write_midi((char[]) {0x90 | channel, pitch, vel}, MSG_SIZE);
+}
 
-  if (avail_write < sizeof(msg)) {
-    return 0; /* no space left */
-  }
-  if (jack_ringbuffer_write(buffer, msg, sizeof(msg)) < sizeof(msg)) {
-    return 0; /* write failed */
-  }
-
-  return 1;
+int
+write_note_off(char channel, char pitch, char vel) {
+  return write_midi((char[]) {0x80 | channel, pitch, vel}, MSG_SIZE);
 }
 
 void
