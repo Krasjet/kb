@@ -1,6 +1,3 @@
-#include <signal.h>
-#include <stdio.h>
-
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>
@@ -50,16 +47,6 @@ shutdown_cb(void *arg)
   die("jack server is down, exiting...");
 }
 
-/* i.e. the only way to properly shutdown the daemon */
-static void
-sig_handler(int signum)
-{
-  puts(""); /* start new line */
-	info("got signal %d, exiting...", signum);
-  jack_shutdown();
-	exit(0);
-}
-
 int
 write_note_on(char channel, char pitch) {
   size_t avail_write = jack_ringbuffer_write_space(buffer);
@@ -105,12 +92,6 @@ jack_shutdown(void)
 void
 jack_init(void)
 {
-  /* catch signal for grace shutdown */
-	signal(SIGQUIT, sig_handler);
-	signal(SIGTERM, sig_handler);
-	signal(SIGHUP, sig_handler);
-	signal(SIGINT, sig_handler);
-
   client = jack_client_open("kb", JackNoStartServer, NULL);
 	if (!client)
     die("can't open client");

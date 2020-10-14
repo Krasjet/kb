@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <getopt.h>
 #include <X11/keysym.h>
 
@@ -12,6 +13,17 @@
 
 static char pressed[MAX_KEYCODE + 1] = { 0 };
 static int octave = 5 /* counting from midi 0, 0 <= octave <=10 */;
+static Display *dpy;
+static volatile int running = 0;
+
+/* i.e. the only way to properly shutdown the daemon */
+static void
+sig_handler(int signum)
+{
+  puts(""); /* start new line */
+	info("got signal %d, exiting...", signum);
+  running = 0;
+}
 
 static void
 usage(const char *name) {
@@ -21,7 +33,6 @@ usage(const char *name) {
 int
 main(int argc, char *argv[])
 {
-  Display *dpy;
   XEvent event;
   int note;
   KeyCode keycode;
@@ -42,6 +53,12 @@ main(int argc, char *argv[])
     }
 	}
 
+  /* catch signal for grace shutdown */
+	signal(SIGQUIT, sig_handler);
+	signal(SIGTERM, sig_handler);
+	signal(SIGHUP, sig_handler);
+	signal(SIGINT, sig_handler);
+
   dpy = x_init();
   info("X started");
 
@@ -51,7 +68,9 @@ main(int argc, char *argv[])
   jack_init();
   info("JACK started");
 
-  while (1) {
+  running = 1;
+
+  while (running) {
     XNextEvent(dpy, &event);
 
     switch (event.type) {
