@@ -6,11 +6,10 @@ CFLAGS  = -Wall -Wextra -std=c99 -pedantic -Os
 LDLIBS  = -lX11 -ljack
 LDFLAGS =
 
-SRC = kb.c jack.c x.c util.c
-OBJ = ${SRC:.c=.o}
+OBJ = kb.o jack.o x.o util.o
 
 kb: $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) $(LDLIBS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
 
 config.h: config.def.h
 	sed 's/def\.//' config.def.h > $@
