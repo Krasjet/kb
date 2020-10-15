@@ -8,12 +8,13 @@ useful debugging tool for developing JACK-based audio applications.
 Usage
 -----
 
-First start a JACK server using jackd or qjackctl [1], then run
+First start a JACK server using `jackd(1)` or `qjackctl(1)` (see [1] for
+details on how to set it up), then run
 
     $ kb
 
-to start the MIDI keyboard daemon. Then, you need to connect the midi_out port
-of kb to other applications (for qjackctl, use the Graph button):
+to start the MIDI keyboard daemon. Then, you need to connect the `midi_out`
+port of kb to other applications (for qjackctl, use the `Graph` button):
 
     +----+-----------+       +-------+-----------+
     | kb |           |       | synth |           |
@@ -49,12 +50,12 @@ them. This is intentional, because I frequently need to edit code while testing
 the MIDI input. As an additional benefit, you can now enjoy some crappy
 generative music while typing.
 
-If you want to shut down the daemon, press Ctrl-C in the terminal to send a
-SIGINT signal or run
+If you want to shut down the daemon, press `Ctrl-C` in the terminal to send a
+`SIGINT` signal or run
 
     $ pkill kb
 
-to kill the daemon process. For more information, see kb(1).
+to kill the daemon process. For more information, see `kb(1)`.
 
 Build
 -----
@@ -68,7 +69,9 @@ For Debian-based distros, install the dependencies by
 
     $ apt-get install libx11-dev libjack-jackd2-dev
 
-Then run
+You also need a C99-compatible C compiler and POSIX make.
+
+After all the requirement are satisfied, run
 
     $ make
 
@@ -81,7 +84,7 @@ to install it to your system.
 Customize
 ---------
 
-kb can be customized by editing the config.h file and recompiling the source
+kb can be customized by editing the `config.h` file and recompiling the source
 code. The default configuration is in `config.def.h`. It provides a simple
 one-row keyboard layout. Run
 
@@ -92,7 +95,7 @@ to obtain the default config file.
 Take a look at the alternative layouts in
 
 - config.2row.h: two row keyboard layout (2 octaves)
-- config.min.h: minimal config file
+- config.min.h: the minimal config file
 
 to understand how to customize kb.
 
