@@ -49,7 +49,7 @@ shutdown_cb(void *arg)
 }
 
 static int
-write_midi(char *msg, size_t size)
+write_midi(const char *msg, size_t size)
 {
   size_t avail_write = jack_ringbuffer_write_space(buffer);
 

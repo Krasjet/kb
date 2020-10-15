@@ -10,7 +10,7 @@ enum {
 };
 
 /* check if key release is from auto repeat */
-int is_auto_repeat(Display *d, XEvent *e);
+int is_auto_repeat(Display *d, const XEvent *e);
 /* update window focus */
 void focus_update(Display *d);
 

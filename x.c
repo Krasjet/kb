@@ -16,7 +16,7 @@ ignore(Display *d, XErrorEvent *e)
 }
 
 int
-is_auto_repeat(Display *d, XEvent *e)
+is_auto_repeat(Display *d, const XEvent *e)
 {
   XEvent next;
   if (e->type == KeyRelease && XEventsQueued(d, QueuedAfterReading)) {
