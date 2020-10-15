@@ -53,23 +53,23 @@ write_midi(const char *msg, size_t size)
 {
   size_t avail_write = jack_ringbuffer_write_space(buffer);
 
-  if (avail_write < size) {
+  if (avail_write < size)
     return 0; /* no space left */
-  }
-  if (jack_ringbuffer_write(buffer, msg, size) < size) {
+  if (jack_ringbuffer_write(buffer, msg, size) < size)
     return 0; /* write failed */
-  }
 
   return 1;
 }
 
 int
-write_note_on(char channel, char pitch, char vel) {
+write_note_on(char channel, char pitch, char vel)
+{
   return write_midi((char[]) {0x90 | channel, pitch, vel}, MSG_SIZE);
 }
 
 int
-write_note_off(char channel, char pitch, char vel) {
+write_note_off(char channel, char pitch, char vel)
+{
   return write_midi((char[]) {0x80 | channel, pitch, vel}, MSG_SIZE);
 }
 
