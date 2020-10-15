@@ -45,11 +45,6 @@ can be used to decrease and increase octave and
 can be used to decrease and increase velocity. You can easily customize these
 keybindings. See CUSTOMIZE section for details.
 
-Note that kb *captures* your key presses in any window. It does not *intercept*
-them. This is intentional, because I frequently need to edit code while testing
-the MIDI input. As an additional benefit, you can now enjoy some crappy
-generative music while typing.
-
 If you want to shut down the daemon, press `Ctrl-C` in the terminal to send a
 `SIGINT` signal or run
 
@@ -105,8 +100,13 @@ to understand how to customize kb.
 Caveats
 -------
 
-kb has only been tested on Linux and with JACK 2. It should work on any system
-with X11 and JACK support, but I have not tested other systems yet. Feedbacks
-are welcome.
+1. kb has only been tested on Linux and with JACK 2. It should work on any
+   system with X11 and JACK support, but I have not tested other systems yet.
+   Feedbacks are welcome.
+2. Note that kb *captures* your key presses in any window. It does not
+   *intercept* them. This is intentional, because I frequently need to edit
+   code while testing the MIDI input. As an additional benefit, you can now
+   enjoy some crappy generative music while typing.
+
 
 [1]: https://ccrma.stanford.edu/docs/common/JACK.html
