@@ -15,22 +15,22 @@ process(jack_nframes_t nframes, void *arg)
   jack_nframes_t i = 0;
   size_t bytes_read;
   jack_midi_data_t msg[MSG_SIZE];
-	void * port_buf;
+  void * port_buf;
 
   (void)arg;
 
   port_buf = jack_port_get_buffer(out_port, nframes);
-	if (!port_buf) {
-		return 0; /* can't allocate buffer, end cycle */
-	}
+  if (!port_buf) {
+    return 0; /* can't allocate buffer, end cycle */
+  }
 
-	jack_midi_clear_buffer(port_buf);
+  jack_midi_clear_buffer(port_buf);
 
   while (i < nframes && jack_ringbuffer_read_space(buffer) >= MSG_SIZE) {
-		bytes_read = jack_ringbuffer_read(buffer, (char *) msg, MSG_SIZE);
+    bytes_read = jack_ringbuffer_read(buffer, (char *) msg, MSG_SIZE);
 
-		if (bytes_read != MSG_SIZE)
-			continue; /* ignore this message */
+    if (bytes_read != MSG_SIZE)
+      continue; /* ignore this message */
 
     jack_midi_event_write(port_buf, i, msg, MSG_SIZE);
 
@@ -76,14 +76,14 @@ void
 jack_init(void)
 {
   client = jack_client_open("kb", JackNoStartServer, NULL);
-	if (!client)
+  if (!client)
     die("can't open client");
 
-	if (jack_set_process_callback(client, process, NULL))
+  if (jack_set_process_callback(client, process, NULL))
     die("can't set up process callback");
   jack_on_shutdown(client, shutdown_cb, NULL);
 
-	out_port = jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE,
+  out_port = jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE,
       JackPortIsOutput, 0);
   if (!out_port)
     die("can't register midi output port");
@@ -94,7 +94,7 @@ jack_init(void)
   if (jack_ringbuffer_mlock(buffer))
     die("can't lock memory");
 
-	if (jack_activate(client))
+  if (jack_activate(client))
     die("cannot activate client");
 }
 

@@ -18,13 +18,13 @@ static void
 sig_handler(int signum)
 {
   puts(""); /* start new line */
-	info("got signal %d, exiting...", signum);
+  info("got signal %d, exiting...", signum);
   running = 0;
 }
 
 static void
 usage(const char *name) {
-	fprintf(stdout, "usage: %s [-c channel]\n", name);
+  fprintf(stdout, "usage: %s [-c channel]\n", name);
 }
 
 int
@@ -40,7 +40,7 @@ main(int argc, char *argv[])
   int velocity = 64;
 
   int c;
-	while ((c = getopt(argc, argv, "c:h")) != -1) {
+  while ((c = getopt(argc, argv, "c:h")) != -1) {
     switch (c) {
     case 'c':
       channel = atoi(optarg) - 1;
@@ -55,13 +55,13 @@ main(int argc, char *argv[])
       usage(argv[0]);
       return 1;
     }
-	}
+  }
 
   /* catch signal for grace shutdown */
-	signal(SIGQUIT, sig_handler);
-	signal(SIGTERM, sig_handler);
-	signal(SIGHUP, sig_handler);
-	signal(SIGINT, sig_handler);
+  signal(SIGQUIT, sig_handler);
+  signal(SIGTERM, sig_handler);
+  signal(SIGHUP, sig_handler);
+  signal(SIGINT, sig_handler);
 
   dpy = x_init();
   info("X started");
