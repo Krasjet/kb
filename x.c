@@ -20,16 +20,19 @@ x_init(void)
   XIEventMask emsk;
   unsigned char mask[XIMaskLen(XI_LASTEVENT)] = {0};
   Window root;
+  int event, error;
+  int major = 2, minor = 0;
 
   Display *dpy = XOpenDisplay(NULL);
   if (!dpy)
     die("can't open display");
   root = DefaultRootWindow(dpy);
 
-  int event, error;
-  if (!XQueryExtension(dpy, "XInputExtension", &xi_opcode, &event, &error)) {
+  if (!XQueryExtension(dpy, "XInputExtension", &xi_opcode, &event, &error))
     die("xinput not available");
-  }
+
+  if (XIQueryVersion(dpy, &major, &minor) != Success)
+    die("xinput 2.0 not available");
 
   /* setup xinput event listener */
   emsk.deviceid = XIAllMasterDevices;
