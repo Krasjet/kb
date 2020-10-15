@@ -36,18 +36,21 @@ main(int argc, char *argv[])
   Display *dpy;
   int note;
   KeyCode keycode;
-  int channel = 0;
+  int channel = 0, auto_connect = 0;
   int velocity = 64;
   int octave = 5; /* counting from midi 0 */
   XEvent event;
 
   int c;
-  while ((c = getopt(argc, argv, "c:h")) != -1) {
+  while ((c = getopt(argc, argv, "ac:h")) != -1) {
     switch (c) {
     case 'c':
       channel = atoi(optarg) - 1;
       if (channel < 0 || channel > 15)
         die("error: channel must be between 1 and 16, inclusive");
+      break;
+    case 'a':
+      auto_connect = 1;
       break;
     case 'h':
       usage(argv[0]);
@@ -70,12 +73,14 @@ main(int argc, char *argv[])
   keybinds_init(dpy);
   info("keybinding loaded");
 
-  jack_init();
+  jack_init(auto_connect);
   info("JACK started");
 
   running = 1;
 
   while (running) {
+    /* check and connect to any new input ports */
+    refresh_ports();
     XNextEvent(dpy, &event);
 
     if (!is_xi_event(dpy, &event.xcookie))

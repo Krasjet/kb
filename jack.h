@@ -47,9 +47,11 @@ int write_note_on(char channel, char pitch, char vel);
  * return: 1 on success, 0 on failure.
  */
 int write_note_off(char channel, char pitch, char vel);
+/* auto connect to any midi input port */
+void refresh_ports(void);
 
 /* init jack */
-void jack_init(void);
+void jack_init(int auto_connect);
 /* grace shutdown jack */
 void jack_shutdown(void);
 

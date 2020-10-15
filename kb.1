@@ -7,7 +7,7 @@ keyboard daemon for
 .
 .SH SYNOPSIS
 .B kb
-.RB [ \-h ]
+.RB [ \-ah ]
 .RB [ \-c
 .IR channel ]
 .
@@ -64,6 +64,18 @@ button):
 |                |       |         audio_out +--->
 |       midi_out +------>+ midi_in           |
 +----------------+       +-------------------+
+.EE
+.in
+.PP
+Alternatively, use the
+.B \-a
+option to let
+.B kb
+automatically detect and connect to input MIDI ports:
+.PP
+.in +4n
+.EX
+$ \fBkb\fP -a
 .EE
 .in
 .PP
@@ -130,6 +142,11 @@ to kill the daemon process.
 .TP
 .B \-h
 Print usage and exit.
+.TP
+.B \-a
+If set, automatically detect and connect to any input
+.SM MIDI
+ports available.
 .TP
 .BI \-c " channel"
 Set the output

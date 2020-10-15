@@ -9,6 +9,7 @@
 static jack_port_t *out_port = NULL;
 static jack_ringbuffer_t *buffer = NULL;
 static jack_client_t *client = NULL;
+static char port_outdated = 1;
 
 static int
 process(jack_nframes_t nframes, void *arg)
@@ -21,15 +22,13 @@ process(jack_nframes_t nframes, void *arg)
   (void)arg;
 
   port_buf = jack_port_get_buffer(out_port, nframes);
-  if (!port_buf) {
+  if (!port_buf)
     return 0; /* can't allocate buffer, end cycle */
-  }
 
   jack_midi_clear_buffer(port_buf);
 
   while (i < nframes && jack_ringbuffer_read_space(buffer) >= MSG_SIZE) {
     bytes_read = jack_ringbuffer_read(buffer, (char *) msg, MSG_SIZE);
-
     if (bytes_read != MSG_SIZE)
       continue; /* ignore this message */
 
@@ -46,6 +45,37 @@ shutdown_cb(void *arg)
 {
   (void)arg;
   die("jack server is down, exiting...");
+}
+
+/* auto connect to any registered midi input port */
+static void
+auto_connect_cb(jack_port_id_t id, int registered, void *arg)
+{
+  (void)id;
+  (void)arg;
+
+  if (registered)
+    port_outdated = 1;
+}
+
+void
+refresh_ports(void)
+{
+  const char **ports;
+
+  if (!port_outdated)
+    return;
+  port_outdated = 0;
+
+  ports = jack_get_ports(client, NULL, JACK_DEFAULT_MIDI_TYPE, JackPortIsInput);
+  if (ports) {
+    int i;
+    for (i = 0; ports[i]; ++i) {
+      if (!jack_connect(client, jack_port_name(out_port), ports[i]))
+        info("connected to %s", ports[i]);
+    }
+    jack_free(ports);
+  }
 }
 
 static int
@@ -74,7 +104,7 @@ write_note_off(char channel, char pitch, char vel)
 }
 
 void
-jack_init(void)
+jack_init(int auto_connect)
 {
   client = jack_client_open("kb", JackNoStartServer, NULL);
   if (!client)
@@ -82,6 +112,11 @@ jack_init(void)
 
   if (jack_set_process_callback(client, process, NULL))
     die("can't set up process callback");
+
+  if (auto_connect &&
+      jack_set_port_registration_callback(client, auto_connect_cb, NULL))
+    die("can't register auto-connect callback");
+
   jack_on_shutdown(client, shutdown_cb, NULL);
 
   out_port = jack_port_register(client, "midi_out", JACK_DEFAULT_MIDI_TYPE,
@@ -97,6 +132,11 @@ jack_init(void)
 
   if (jack_activate(client))
     die("cannot activate client");
+
+  if (auto_connect)
+    refresh_ports();
+  else
+    port_outdated = 0; /* never update port */
 }
 
 void

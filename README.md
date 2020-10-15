@@ -23,6 +23,11 @@ port of kb to other applications (for qjackctl, use the `Graph` button):
     |       midi_out +------>+ midi_in           |
     +----------------+       +-------------------+
 
+Alternatively, use the `-a` option to let kb automatically detect and connect
+to input MIDI ports:
+
+    $ kb -a
+
 kb will capture all the key presses and convert them into MIDI messages
 according to your configuration.
 
@@ -107,6 +112,5 @@ Caveats
    *intercept* them. This is intentional, because I frequently need to edit
    code while testing the MIDI input. As an additional benefit, you can now
    enjoy some crappy generative music while typing.
-
 
 [1]: https://ccrma.stanford.edu/docs/common/JACK.html
