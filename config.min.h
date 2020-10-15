@@ -8,7 +8,8 @@ enum {
 static opcode_t keybinds[MAX_KEYCODE + 1];
 
 void
-keybinds_init(Display *d) {
+keybinds_init(Display *d)
+{
   size_t i;
 
   /* map every key to C4 */

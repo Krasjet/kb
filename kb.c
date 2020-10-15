@@ -25,7 +25,8 @@ sig_handler(int signum)
 }
 
 static void
-usage(const char *name) {
+usage(const char *name)
+{
   fprintf(stdout, "usage: %s [-c channel]\n", name);
 }
 
@@ -45,9 +46,8 @@ main(int argc, char *argv[])
     switch (c) {
     case 'c':
       channel = atoi(optarg) - 1;
-      if (channel < 0 || channel > 15) {
+      if (channel < 0 || channel > 15)
         die("error: channel must be between 1 and 16, inclusive");
-      }
       break;
     case 'h':
       usage(argv[0]);
@@ -78,9 +78,8 @@ main(int argc, char *argv[])
   while (running) {
     XNextEvent(dpy, &event);
 
-    if (!is_xi_event(dpy, &event.xcookie)){
+    if (!is_xi_event(dpy, &event.xcookie))
       continue; /* not an xinput event, skip */
-    }
 
     switch (event.xcookie.evtype) {
     case XI_RawKeyPress:
@@ -121,9 +120,8 @@ main(int argc, char *argv[])
       keycode = ((XIRawEvent *)event.xcookie.data)->detail;
 
       note = octave * 12 + keybinds[keycode];
-      if (keybinds[keycode] >= 0 && note <= MAX_MIDI_NOTE) {
+      if (keybinds[keycode] >= 0 && note <= MAX_MIDI_NOTE)
         write_note_off(channel, note, velocity);
-      }
       break;
     }
     XFreeEventData(dpy, &event.xcookie);

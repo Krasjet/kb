@@ -67,7 +67,8 @@ static struct SymBind symbinds[] = {
 };
 
 void
-keybinds_init(Display *d) {
+keybinds_init(Display *d)
+{
   size_t i;
 
   for (i = 0; i < sizeof(keybinds)/sizeof(keybinds[0]); ++i) {
