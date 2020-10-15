@@ -1,0 +1,157 @@
+.cflags 1 ,
+.TH KB 1
+.SH NAME
+kb \-
+.SM MIDI
+keyboard daemon for
+.SM JACK
+.
+.SH SYNOPSIS
+.B kb
+.RB [ \-h ]
+.RB [ \-c
+.IR channel ]
+.
+.SH DESCRIPTION
+.B kb
+is a customizable virtual
+.SM MIDI
+keyboard daemon for
+.SM JACK
+Audio Connection Kit.
+It provides
+.SM MIDI
+input for standalone
+.SM JACK
+synthesizers and can be a useful debugging tool for developing \s-1JACK\s0-based
+audio applications.
+.
+.PP
+To use
+.BR kb ,
+first start a
+.SM JACK
+server using
+.B jackd(1)
+or
+.BR qjackctl(1) .
+Then run
+.PP
+.in +4n
+.EX
+$ \fBkb\fP
+.EE
+.in
+.PP
+to start the
+.SM MIDI
+keyboard daemon.
+.
+Connect the
+.B midi_out
+port of
+.B kb
+to other applications (for
+.BR qjackctl(1) ,
+use the
+.I Graph
+button):
+.PP
+.in +4n
+.EX
++----+-----------+       +-------+-----------+
+| kb |           |       | synth |           |
++----+           |       +-------+           |
+|                |       |         audio_out +--->
+|       midi_out +------>+ midi_in           |
++----------------+       +-------------------+
+.EE
+.in
+.PP
+.B kb
+will capture all the key presses and convert them into
+.SM MIDI
+messages according to your configuration.
+.
+.PP
+If you compiled with default configuration, the home row of a QWERTY keyboard
+.PP
+.in +4n
+.EX
+ASDFGHJKL;'
+.EE
+.in
+.PP
+corresponds to the white keys on a piano keyboard, and
+.PP
+.in +4n
+.EX
+WETYUOP]
+.EE
+.in
+.PP
+corresponds to the black keys.
+Additionally,
+.PP
+.in +4n
+.EX
+ZX
+.EE
+.in
+.PP
+can be used to decrease and increase octave and
+.PP
+.in +4n
+.EX
+CV
+.EE
+.in
+.PP
+can be used to decrease and increase velocity.
+However, the keybindings of your
+.B kb
+might be different.
+.
+.PP
+Note that kb
+.I captures
+your key presses in any window.
+It does not
+.I intercept
+them.
+This is intentional, because I frequently need to edit code while testing
+the MIDI input.
+As an additional benefit, you can now enjoy some crappy generative music while
+typing.
+.
+.PP
+If you want to shut down the daemon, press
+.B Ctrl-C
+in the terminal to send a
+.B SIGINT
+signal or run
+.PP
+.in +4n
+.EX
+$ pkill kb
+.EE
+.in
+.PP
+to kill the daemon process.
+.
+.SH OPTIONS
+.TP
+.B \-h
+Print usage and exit.
+.TP
+.BI \-c " channel"
+Set the output
+.SM MIDI
+channel.
+Must be between
+.B 1
+to
+.BR 16 ,
+inclusive.
+The default is
+.BR 1 .
