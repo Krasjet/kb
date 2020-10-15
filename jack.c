@@ -73,18 +73,6 @@ write_note_off(char channel, char pitch, char vel) {
 }
 
 void
-jack_shutdown(void)
-{
-  if (client) {
-    jack_deactivate(client);
-    jack_client_close(client);
-  }
-  if (buffer) {
-    jack_ringbuffer_free(buffer);
-  }
-}
-
-void
 jack_init(void)
 {
   client = jack_client_open("kb", JackNoStartServer, NULL);
@@ -108,4 +96,16 @@ jack_init(void)
 
 	if (jack_activate(client))
     die("cannot activate client");
+}
+
+void
+jack_shutdown(void)
+{
+  if (client) {
+    jack_deactivate(client);
+    jack_client_close(client);
+  }
+  if (buffer) {
+    jack_ringbuffer_free(buffer);
+  }
 }
