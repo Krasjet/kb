@@ -40,7 +40,7 @@ main(int argc, char *argv[])
   int velocity = 64;
 
   int c;
-	while ((c = getopt(argc, argv, "c:")) != -1) {
+	while ((c = getopt(argc, argv, "c:h")) != -1) {
     switch (c) {
     case 'c':
       channel = atoi(optarg) - 1;
@@ -48,6 +48,9 @@ main(int argc, char *argv[])
         die("error: channel must be between 1 and 16, inclusive");
       }
       break;
+    case 'h':
+      usage(argv[0]);
+      return 0;
     default:
       usage(argv[0]);
       return 1;
