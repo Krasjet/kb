@@ -36,7 +36,7 @@ main(int argc, char *argv[])
   KeyCode keycode;
   int channel = 0;
   char pressed[MAX_KEYCODE + 1] = { 0 };
-  int octave = 5; /* counting from midi 0, 0 <= octave <=10 */
+  int octave = 5; /* counting from midi 0 */
   int velocity = 64;
 
   int c;
