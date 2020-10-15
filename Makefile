@@ -27,11 +27,14 @@ clean:
 nuke: clean
 	rm -f config.h
 
-install: kb
+install: kb kb.1
 	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	mkdir -p $(DESTDIR)$(PREFIX)/share/man/man1
 	install -m 755 kb $(DESTDIR)$(PREFIX)/bin
+	gzip < kb.1 > $(DESTDIR)$(PREFIX)/share/man/man1/kb.1.gz
 
 uninstall:
 	rm -f $(DESTDIR)$(PREFIX)/bin/fretl
+	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/kb.1.gz
 
 .PHONY: run clean nuke install uninstall
