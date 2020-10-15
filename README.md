@@ -99,4 +99,11 @@ Take a look at the alternative layouts in
 
 to understand how to customize kb.
 
+Caveats
+-------
+
+kb has only been tested on Linux and with JACK 2. It should work on any system
+with X11 and JACK support, but I have not tested other systems yet. Feedbacks
+are welcome.
+
 [1]: https://ccrma.stanford.edu/docs/common/JACK.html
