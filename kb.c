@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <getopt.h>
 #include <X11/keysym.h>
+#include <X11/extensions/XInput2.h>
 
 #include "jack.h"
 #include "x.h"
@@ -32,13 +33,12 @@ int
 main(int argc, char *argv[])
 {
   Display *dpy;
-  XEvent event;
   int note;
   KeyCode keycode;
   int channel = 0;
-  char pressed[MAX_KEYCODE + 1] = { 0 };
-  int octave = 5; /* counting from midi 0 */
   int velocity = 64;
+  int octave = 5; /* counting from midi 0 */
+  XEvent event;
 
   int c;
   while ((c = getopt(argc, argv, "c:h")) != -1) {
@@ -78,10 +78,13 @@ main(int argc, char *argv[])
   while (running) {
     XNextEvent(dpy, &event);
 
-    switch (event.type) {
-    case KeyPress:
-      keycode = event.xkey.keycode;
-      pressed[keycode] = 1;
+    if (!is_xi_event(dpy, &event.xcookie)){
+      continue; /* not an xinput event, skip */
+    }
+
+    switch (event.xcookie.evtype) {
+    case XI_RawKeyPress:
+      keycode = ((XIRawEvent *)event.xcookie.data)->detail;
       if (keybinds[keycode] >= 0) {
         /* play note */
         note = octave * 12 + keybinds[keycode];
@@ -114,27 +117,16 @@ main(int argc, char *argv[])
         }
       }
       break;
-    case KeyRelease:
-      keycode = event.xkey.keycode;
-      if (is_auto_repeat(dpy, &event)) {
-        /* probably a bug in X11, we will get an extra release event before press */
-        if (pressed[keycode]) {
-          XNextEvent(dpy, &event); /* consume auto repeat */
-        }
-      } else {
-        /* turn off note */
-        pressed[keycode] = 0;
+    case XI_RawKeyRelease:
+      keycode = ((XIRawEvent *)event.xcookie.data)->detail;
 
-        note = octave * 12 + keybinds[keycode];
-        if (keybinds[keycode] >= 0 && note <= MAX_MIDI_NOTE) {
-          write_note_off(channel, note, velocity);
-        }
+      note = octave * 12 + keybinds[keycode];
+      if (keybinds[keycode] >= 0 && note <= MAX_MIDI_NOTE) {
+        write_note_off(channel, note, velocity);
       }
       break;
-    case FocusOut:
-      focus_update(dpy);
-      break;
     }
+    XFreeEventData(dpy, &event.xcookie);
   }
 
   jack_shutdown();

@@ -2,62 +2,43 @@
 #include "util.h"
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
+#include <X11/extensions/XInput2.h>
 
-static Window root, focus;
-
-static int
-ignore(Display *d, XErrorEvent *e)
-{
-  (void)d;
-  if (e->error_code != BadWindow) {
-    die("unexpected X error");
-  }
-  return 0;
-}
+static int xi_opcode;
 
 int
-is_auto_repeat(Display *d, const XEvent *e)
+is_xi_event(Display *d, XGenericEventCookie *cookie)
 {
-  XEvent next;
-  if (e->type == KeyRelease && XEventsQueued(d, QueuedAfterReading)) {
-    XPeekEvent(d, &next);
-    return next.type == KeyPress &&
-           next.xkey.time == e->xkey.time &&
-           next.xkey.keycode == e->xkey.keycode;
-  }
-  return 0;
-}
-
-void
-focus_update(Display *d)
-{
-  int state;
-
-  if (focus != root)
-    XSelectInput(d, focus, NoEventMask);
-
-  /* get new focus */
-  XGetInputFocus(d, &focus, &state);
-  if (focus == PointerRoot)
-    focus = root;
-  XSelectInput(d, focus, KeyPressMask | KeyReleaseMask | FocusChangeMask);
+  return XGetEventData(d, cookie) &&
+         cookie->type == GenericEvent &&
+         cookie->extension == xi_opcode;
 }
 
 Display *
 x_init(void)
 {
-  int state;
+  XIEventMask emsk;
+  unsigned char mask[XIMaskLen(XI_LASTEVENT)] = {0};
+  Window root;
 
   Display *dpy = XOpenDisplay(NULL);
   if (!dpy)
     die("can't open display");
   root = DefaultRootWindow(dpy);
 
-  XGetInputFocus(dpy, &focus, &state);
-  XSelectInput(dpy, focus, KeyPressMask | KeyReleaseMask | FocusChangeMask);
+  int event, error;
+  if (!XQueryExtension(dpy, "XInputExtension", &xi_opcode, &event, &error)) {
+    die("xinput not available");
+  }
 
-  /* ignore if window has been closed */
-  XSetErrorHandler(ignore);
+  /* setup xinput event listener */
+  emsk.deviceid = XIAllMasterDevices;
+  emsk.mask_len = XIMaskLen(XI_LASTEVENT);
+  emsk.mask = mask;
+  XISetMask(emsk.mask, XI_RawKeyPress);
+  XISetMask(emsk.mask, XI_RawKeyRelease);
+  XISelectEvents(dpy, root, &emsk, 1);
+  XSync(dpy, False);
 
   return dpy;
 }

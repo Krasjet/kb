@@ -3,7 +3,7 @@
 # you might need to customize the flags for your system
 PREFIX  = /usr/local
 CFLAGS  = -Wall -Wextra -std=c99 -pedantic -Os
-LDLIBS  = -lX11 -ljack
+LDLIBS  = -lX11 -ljack -lXi
 LDFLAGS =
 
 OBJ = kb.o jack.o x.o util.o

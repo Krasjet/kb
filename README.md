@@ -60,18 +60,21 @@ to kill the daemon process. For more information, see `kb(1)`.
 Build
 -----
 
-First, make sure Xlib and JACK are installed. For Arch-based distros, they can
-be installed by
+First, make sure JACK, Xlib, and libxi are installed. For Arch-based distros,
+they can be installed by
 
-    $ pacman -S libx11 jack2
+    $ pacman -S jack2 libx11 libxi
 
 For Debian-based distros, install the dependencies by
 
-    $ apt-get install libx11-dev libjack-jackd2-dev
+    $ apt-get install libjack-jackd2-dev libx11-dev libxi-dev
 
-You also need a C99-compatible C compiler and POSIX make.
+If you don't want to use libxi, check out the `no_ext` branch. The `no_ext`
+version works exactly the same, but it might have some issues capturing input
+within REAPER on Linux.
 
-After all the requirement are satisfied, run
+You also need a C99-compatible C compiler and POSIX make. After all the
+requirement are satisfied, run
 
     $ make
 
