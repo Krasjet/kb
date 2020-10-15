@@ -1,3 +1,4 @@
+/* kb.c: main module for kb */
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>

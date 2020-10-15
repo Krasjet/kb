@@ -1,3 +1,4 @@
+/* jack.c: interface to jack */
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>

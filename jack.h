@@ -1,3 +1,4 @@
+/* jack.h: interface to jack */
 #ifndef KB_JACK_H
 #define KB_JACK_H
 

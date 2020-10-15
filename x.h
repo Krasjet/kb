@@ -1,3 +1,4 @@
+/* x.h: interface to X window system */
 #ifndef KB_X_H
 #define KB_X_H
 

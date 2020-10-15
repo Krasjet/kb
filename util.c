@@ -1,3 +1,4 @@
+/* util.c: common utilities */
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>

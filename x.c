@@ -1,3 +1,4 @@
+/* x.c: interface to X window system */
 #include "util.h"
 #include <X11/Xlib.h>
 #include <X11/keysym.h>

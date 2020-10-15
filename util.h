@@ -1,3 +1,4 @@
+/* util.h: common utilities */
 #ifndef KB_UTIL_H
 #define KB_UTIL_H
 
