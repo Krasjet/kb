@@ -54,8 +54,11 @@ auto_connect_cb(jack_port_id_t id, int registered, void *arg)
   (void)id;
   (void)arg;
 
-  if (registered)
+  if (registered) {
+    /* we can't refresh port in the callback because this is called in
+     * a notification thread */
     port_outdated = 1;
+  }
 }
 
 void
