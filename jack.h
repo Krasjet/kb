@@ -11,6 +11,12 @@ enum {
   MIN_VELOCITY = 0
 };
 
+enum Controls {
+  CTRL_ALL_SOUND_OFF = 120,
+  CTRL_RESET_CONTROLLERS = 121,
+  CTRL_ALL_NOTES_OFF = 123,
+};
+
 /*
  * opcodes for keybindings
  *
@@ -48,6 +54,11 @@ int write_note_on(char channel, char pitch, char vel);
  * return: 1 on success, 0 on failure.
  */
 int write_note_off(char channel, char pitch, char vel);
+/*
+ * writes control midi message to buffer.
+ * return: 1 on success, 0 on failure.
+ */
+int write_control(char channel, char controller, char val);
 /* auto connect to any midi input port */
 void refresh_ports(void);
 

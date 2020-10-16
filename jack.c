@@ -106,6 +106,12 @@ write_note_off(char channel, char pitch, char vel)
   return write_midi((char[]) {0x80 | channel, pitch, vel}, MSG_SIZE);
 }
 
+int
+write_control(char channel, char controller, char val)
+{
+  return write_midi((char[]) {0xB0 | channel, controller, val}, MSG_SIZE);
+}
+
 void
 jack_init(int auto_connect)
 {

@@ -119,8 +119,12 @@ main(int argc, char *argv[])
             velocity = MIN_VELOCITY;
           break;
         case OP_PANIC: /* turn off all midi notes */
-          for (i = 0; i <= MAX_MIDI_NOTE; ++i)
+          for (i = 0; i <= MAX_MIDI_NOTE; ++i) {
             write_note_off(channel, i, velocity);
+          }
+          write_control(channel, CTRL_ALL_NOTES_OFF, 0x00);
+          write_control(channel, CTRL_ALL_SOUND_OFF, 0x00);
+          write_control(channel, CTRL_RESET_CONTROLLERS, 0x00);
           break;
         default: break;
         }
