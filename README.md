@@ -43,12 +43,13 @@ corresponds to the black keys. Additionally,
 
     ZX
 
-can be used to decrease and increase octave and
+can be used to decrease and increase octave,
 
     CV
 
-can be used to decrease and increase velocity. You can easily customize these
-keybindings. See CUSTOMIZE section for details.
+can be used to decrease and increase velocity, and the Escape key is the panic
+button (turn off all notes). You can easily customize these keybindings. See
+CUSTOMIZE section for details.
 
 If you want to shut down the daemon, press `Ctrl-C` in the terminal to send a
 `SIGINT` signal or run

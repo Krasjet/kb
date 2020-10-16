@@ -18,11 +18,12 @@ enum {
  * < 0 values represent operations
  */
 typedef enum {
-  OP_INVALID = -5,
+  OP_INVALID = -6,
   OP_INC_OCTAVE,
   OP_DEC_OCTAVE,
   OP_INC_VELOCITY,
   OP_DEC_VELOCITY,
+  OP_PANIC,
   OP_C = 0,
   OP_CSHARP,
   OP_D,

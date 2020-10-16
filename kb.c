@@ -95,6 +95,7 @@ main(int argc, char *argv[])
         if (note <= MAX_MIDI_NOTE)
           write_note_on(channel, note, velocity);
       } else {
+        int i;
         /* opeartions */
         switch (keybinds[keycode]) {
         case OP_INC_OCTAVE:
@@ -116,6 +117,10 @@ main(int argc, char *argv[])
             velocity -= 10;
           else
             velocity = MIN_VELOCITY;
+          break;
+        case OP_PANIC: /* turn off all midi notes */
+          for (i = 0; i <= MAX_MIDI_NOTE; ++i)
+            write_note_off(channel, i, velocity);
           break;
         default: break;
         }
