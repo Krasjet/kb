@@ -39,17 +39,10 @@ corresponds to the white keys on a piano keyboard, and
 
     WETYUOP]
 
-corresponds to the black keys. Additionally,
-
-    ZX
-
-can be used to decrease and increase octave,
-
-    CV
-
-can be used to decrease and increase velocity, and the Escape key is the panic
-button (turn off all notes). You can easily customize these keybindings. See
-CUSTOMIZE section for details.
+corresponds to the black keys. Additionally, `ZX`, `CV`, `90`, and `-=` can be
+used to decrement and increment octave, velocity, bank, and program,
+respectively. And the Escape key is the panic button (turn off all notes). You
+can easily customize these keybindings. See CUSTOMIZE section for details.
 
 If you want to shut down the daemon, press `Ctrl-C` in the terminal to send a
 `SIGINT` signal or run

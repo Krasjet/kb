@@ -13,6 +13,17 @@
 /* load config */
 #include "config.h"
 
+
+#define INC_CLAMP(val, inc, max) \
+  do { \
+    val = (val + inc > max) ? max : val + inc; \
+  } while(0)
+
+#define DEC_CLAMP(val, dec, min) \
+  do { \
+    val = (val - dec < min) ? min : val - dec; \
+  } while(0)
+
 static volatile int running = 0;
 
 /* i.e. the only way to properly shutdown the daemon */
@@ -37,7 +48,7 @@ main(int argc, char *argv[])
   int note;
   KeyCode keycode;
   int channel = 0, auto_connect = 0;
-  int velocity = 64;
+  int velocity = 64, bank = 0, prog = 0;
   int octave = 5; /* counting from midi 0 */
   XEvent event;
 
@@ -92,34 +103,42 @@ main(int argc, char *argv[])
       if (keybinds[keycode] >= 0) {
         /* play note */
         note = octave * 12 + keybinds[keycode];
-        if (note <= MAX_MIDI_NOTE)
+        if (note <= MAX_DATA)
           write_note_on(channel, note, velocity);
       } else {
         int i;
         /* opeartions */
         switch (keybinds[keycode]) {
         case OP_INC_OCTAVE:
-          if (octave < MAX_OCTAVE)
-            octave++;
+          INC_CLAMP(octave, 1, MAX_OCTAVE);
           break;
         case OP_DEC_OCTAVE:
-          if (octave > MIN_OCTAVE)
-            octave--;
+          DEC_CLAMP(octave, 1, MIN_OCTAVE);
           break;
         case OP_INC_VELOCITY:
-          if (velocity + 10 <= MAX_VELOCITY)
-            velocity += 10;
-          else
-            velocity = MAX_VELOCITY;
+          INC_CLAMP(velocity, 10, MAX_DATA);
           break;
         case OP_DEC_VELOCITY:
-          if (velocity - 10 >= MIN_VELOCITY)
-            velocity -= 10;
-          else
-            velocity = MIN_VELOCITY;
+          DEC_CLAMP(velocity, 10, MIN_DATA);
+          break;
+        case OP_INC_BANK:
+          INC_CLAMP(bank, 1, MAX_BANK);
+          write_bank_sel(channel, bank);
+          break;
+        case OP_DEC_BANK:
+          DEC_CLAMP(bank, 1, MIN_DATA);
+          write_bank_sel(channel, bank);
+          break;
+        case OP_INC_PROG:
+          INC_CLAMP(prog, 1, MAX_DATA);
+          write_prog_change(channel, prog);
+          break;
+        case OP_DEC_PROG:
+          DEC_CLAMP(prog, 1, MIN_DATA);
+          write_prog_change(channel, prog);
           break;
         case OP_PANIC: /* turn off all midi notes */
-          for (i = 0; i <= MAX_MIDI_NOTE; ++i) {
+          for (i = 0; i <= MAX_DATA; ++i) {
             write_note_off(channel, i, velocity);
           }
           write_control(channel, CTRL_ALL_NOTES_OFF, 0x00);
@@ -134,7 +153,7 @@ main(int argc, char *argv[])
       keycode = ((XIRawEvent *)event.xcookie.data)->detail;
 
       note = octave * 12 + keybinds[keycode];
-      if (keybinds[keycode] >= 0 && note <= MAX_MIDI_NOTE)
+      if (keybinds[keycode] >= 0 && note <= MAX_DATA)
         write_note_off(channel, note, velocity);
       break;
     }

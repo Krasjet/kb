@@ -58,6 +58,10 @@ static struct SymBind symbinds[] = {
   { XK_Z,            OP_DEC_OCTAVE   },
   { XK_V,            OP_INC_VELOCITY },
   { XK_C,            OP_DEC_VELOCITY },
+  { XK_equal,        OP_INC_PROG     },
+  { XK_minus,        OP_DEC_PROG     },
+  { XK_0,            OP_INC_BANK     },
+  { XK_9,            OP_DEC_BANK     },
   { XK_Escape,       OP_PANIC        },
 };
 

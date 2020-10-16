@@ -2,16 +2,19 @@
 #ifndef KB_JACK_H
 #define KB_JACK_H
 
+#include <stdint.h>
+
 enum {
-  /* we only need 3 byte MIDI message */
-  MSG_SIZE = 3,
-  /* valid MIDI notes 0-127 */
-  MAX_MIDI_NOTE = 127,
-  MAX_VELOCITY = 127,
-  MIN_VELOCITY = 0
+  MAX_MSG_SIZE = 3,
+  /* valid MIDI data byte 0-127 */
+  MAX_DATA = (1u << 7u) - 1,
+  MIN_DATA = 0,
+  MAX_BANK = (1u << 14u) - 1,
 };
 
 enum Controls {
+  CTRL_BANK_SEL_MSB = 0,
+  CTRL_BANK_SEL_LSB = 32,
   CTRL_ALL_SOUND_OFF = 120,
   CTRL_RESET_CONTROLLERS = 121,
   CTRL_ALL_NOTES_OFF = 123,
@@ -24,11 +27,15 @@ enum Controls {
  * < 0 values represent operations
  */
 typedef enum {
-  OP_INVALID = -6,
+  OP_INVALID = -10,
   OP_INC_OCTAVE,
   OP_DEC_OCTAVE,
   OP_INC_VELOCITY,
   OP_DEC_VELOCITY,
+  OP_INC_BANK,
+  OP_DEC_BANK,
+  OP_INC_PROG,
+  OP_DEC_PROG,
   OP_PANIC,
   OP_C = 0,
   OP_CSHARP,
@@ -59,6 +66,16 @@ int write_note_off(char channel, char pitch, char vel);
  * return: 1 on success, 0 on failure.
  */
 int write_control(char channel, char controller, char val);
+/*
+ * writes bank select midi message to buffer.
+ * return: 1 on success, 0 on failure.
+ */
+int write_bank_sel(char channel, uint_least16_t val);
+/*
+ * writes prog change message to buffer.
+ * return: 1 on success, 0 on failure.
+ */
+int write_prog_change(char channel, char prog);
 /* auto connect to any midi input port */
 void refresh_ports(void);
 

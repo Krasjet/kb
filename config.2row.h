@@ -64,6 +64,10 @@ static struct SymBind symbinds[] = {
   { XK_Down,         OP_DEC_OCTAVE   },
   { XK_Right,        OP_INC_VELOCITY },
   { XK_Left,         OP_DEC_VELOCITY },
+  { XK_F4,           OP_INC_PROG     },
+  { XK_F3,           OP_DEC_PROG     },
+  { XK_F2,           OP_INC_BANK     },
+  { XK_F1,           OP_DEC_BANK     },
   { XK_Escape,       OP_PANIC        },
 };
 

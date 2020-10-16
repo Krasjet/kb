@@ -6,6 +6,13 @@
 #include "util.h"
 #include "jack.h"
 
+enum MidiStatus {
+  NOTE_OFF    = 0x80,
+  NOTE_ON     = 0x90,
+  CTRL_CHANGE = 0xB0,
+  PROG_CHANGE = 0xC0
+};
+
 static jack_port_t *out_port = NULL;
 static jack_ringbuffer_t *buffer = NULL;
 static jack_client_t *client = NULL;
@@ -15,9 +22,10 @@ static int
 process(jack_nframes_t nframes, void *arg)
 {
   jack_nframes_t i = 0;
-  size_t bytes_read;
-  jack_midi_data_t msg[MSG_SIZE];
+  size_t bytes_read, bytes_to_read, space;
+  jack_midi_data_t msg[MAX_MSG_SIZE];
   void * port_buf;
+  char midi_status;
 
   (void)arg;
 
@@ -27,14 +35,37 @@ process(jack_nframes_t nframes, void *arg)
 
   jack_midi_clear_buffer(port_buf);
 
-  while (i < nframes && jack_ringbuffer_read_space(buffer) >= MSG_SIZE) {
-    bytes_read = jack_ringbuffer_read(buffer, (char *) msg, MSG_SIZE);
-    if (bytes_read != MSG_SIZE)
-      continue; /* ignore this message */
+  space = jack_ringbuffer_read_space(buffer);
 
-    jack_midi_event_write(port_buf, i, msg, MSG_SIZE);
+  while (i < nframes && space > 0) {
+    jack_ringbuffer_peek(buffer, &midi_status, 1);
+
+    switch (midi_status & 0xf0) {
+    case NOTE_OFF:
+    case NOTE_ON:
+    case CTRL_CHANGE:
+      bytes_to_read = 3;
+      break;
+    case PROG_CHANGE:
+      bytes_to_read = 2;
+      break;
+    default:
+      jack_ringbuffer_read_advance(buffer, 1);
+      goto ignore;
+    }
+
+    if (space < bytes_to_read)
+      break;
+
+    bytes_read = jack_ringbuffer_read(buffer, (char *) msg, bytes_to_read);
+    if (bytes_read != bytes_to_read)
+      goto ignore;
+
+    jack_midi_event_write(port_buf, i, msg, bytes_read);
 
     i++;
+ignore:
+    space = jack_ringbuffer_read_space(buffer);
   }
 
   return 0;
@@ -97,19 +128,35 @@ write_midi(const char *msg, size_t size)
 int
 write_note_on(char channel, char pitch, char vel)
 {
-  return write_midi((char[]) {0x90 | channel, pitch, vel}, MSG_SIZE);
+  return write_midi((char[]) {NOTE_ON | channel, pitch, vel}, 3);
 }
 
 int
 write_note_off(char channel, char pitch, char vel)
 {
-  return write_midi((char[]) {0x80 | channel, pitch, vel}, MSG_SIZE);
+  return write_midi((char[]) {NOTE_OFF | channel, pitch, vel}, 3);
 }
 
 int
 write_control(char channel, char controller, char val)
 {
-  return write_midi((char[]) {0xB0 | channel, controller, val}, MSG_SIZE);
+  return write_midi((char[]) {CTRL_CHANGE | channel, controller, val}, 3);
+}
+
+int
+write_bank_sel(char channel, uint_least16_t val)
+{
+  return write_midi(
+    (char[]) {
+      CTRL_CHANGE | channel, CTRL_BANK_SEL_LSB, val & 0x7f,
+      CTRL_CHANGE | channel, CTRL_BANK_SEL_MSB, (val >> 7) & 0x7f
+    }, 6
+  );
+}
+
+int write_prog_change(char channel, char prog)
+{
+  return write_midi((char[]) {PROG_CHANGE | channel, prog}, 2);
 }
 
 void
@@ -133,7 +180,7 @@ jack_init(int auto_connect)
   if (!out_port)
     die("can't register midi output port");
 
-  buffer = jack_ringbuffer_create(1024 * MSG_SIZE);
+  buffer = jack_ringbuffer_create(1024 * MAX_MSG_SIZE);
   if (!buffer)
     die("can't create midi message buffer");
   if (jack_ringbuffer_mlock(buffer))
