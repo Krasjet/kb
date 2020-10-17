@@ -15,14 +15,10 @@
 
 
 #define INC_CLAMP(val, inc, max) \
-  do { \
-    val = (val + inc > max) ? max : val + inc; \
-  } while(0)
+    val = (val + inc > max) ? max : val + inc
 
 #define DEC_CLAMP(val, dec, min) \
-  do { \
-    val = (val - dec < min) ? min : val - dec; \
-  } while(0)
+    val = (val - dec < min) ? min : val - dec
 
 static volatile int running = 0;
 
