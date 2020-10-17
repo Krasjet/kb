@@ -34,7 +34,7 @@ sig_handler(int signum)
 static void
 usage(const char *name)
 {
-  fprintf(stdout, "usage: %s [-c channel]\n", name);
+  fprintf(stdout, "usage: %s [-ah] [-c channel]\n", name);
 }
 
 int
