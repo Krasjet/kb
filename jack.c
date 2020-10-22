@@ -148,8 +148,8 @@ write_bank_sel(char channel, uint_least16_t val)
 {
   return write_midi(
     (char[]) {
-      CTRL_CHANGE | channel, CTRL_BANK_SEL_LSB, val & 0x7f,
-      CTRL_CHANGE | channel, CTRL_BANK_SEL_MSB, (val >> 7) & 0x7f
+      CTRL_CHANGE | channel, CTRL_BANK_SEL_MSB, (val >> 7) & 0x7f,
+      CTRL_CHANGE | channel, CTRL_BANK_SEL_LSB, val & 0x7f
     }, 6
   );
 }
