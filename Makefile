@@ -34,7 +34,7 @@ install: kb kb.1
 	gzip < kb.1 > $(DESTDIR)$(PREFIX)/share/man/man1/kb.1.gz
 
 uninstall:
-	rm -f $(DESTDIR)$(PREFIX)/bin/fretl
+	rm -f $(DESTDIR)$(PREFIX)/bin/kb
 	rm -f $(DESTDIR)$(PREFIX)/share/man/man1/kb.1.gz
 
 .PHONY: run clean nuke install uninstall
