@@ -14,7 +14,8 @@ details on how to set it up), then run
     $ kb
 
 to start the MIDI keyboard daemon. Then, you need to connect the `midi_out`
-port of kb to other applications (for qjackctl, use the `Graph` button):
+port of kb to other applications (for qjackctl, use the `Graph` or `Connect`
+button):
 
     +----+-----------+       +-------+-----------+
     | kb |           |       | synth |           |
@@ -96,6 +97,17 @@ Take a look at the alternative layouts in
 
 to understand how to customize kb.
 
+FQA
+---
+
+Can I use kb with ALSA?
+
+  Use a2jmidid [2].
+
+How can I add new MIDI messages?
+
+  See `write_midi` in jack.c.
+
 Caveats
 -------
 
@@ -108,3 +120,4 @@ Caveats
    enjoy some crappy generative music while typing.
 
 [1]: https://ccrma.stanford.edu/docs/common/JACK.html
+[2]: https://github.com/linuxaudio/a2jmidid/
