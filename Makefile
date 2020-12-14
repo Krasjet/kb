@@ -2,6 +2,8 @@
 
 # you might need to customize the flags for your system
 PREFIX  = /usr/local
+
+CC = cc
 CFLAGS  = -Wall -Wextra -std=c99 -pedantic -Os
 LDLIBS  = -lX11 -ljack -lXi
 LDFLAGS =
