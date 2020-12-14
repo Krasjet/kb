@@ -45,7 +45,8 @@ x_init(void)
   return dpy;
 }
 
-void x_shutdown(Display *d)
+void
+x_shutdown(Display *d)
 {
   XCloseDisplay(d);
 }
