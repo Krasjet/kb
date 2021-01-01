@@ -5,7 +5,6 @@
 #include <stdint.h>
 
 enum {
-  MAX_MSG_SIZE = 3,
   /* valid MIDI data byte 0-127 */
   MAX_DATA = (1u << 7u) - 1,
   MIN_DATA = 0,

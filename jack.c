@@ -2,6 +2,7 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 #include <jack/ringbuffer.h>
+#include <string.h>
 
 #include "util.h"
 #include "jack.h"
@@ -13,6 +14,12 @@ enum MidiStatus {
   PROG_CHANGE = 0xC0
 };
 
+typedef struct {
+  jack_nframes_t frame;
+  uint8_t len;
+  uint8_t data[3];
+} MidiMessage;
+
 static jack_port_t *out_port = NULL;
 static jack_ringbuffer_t *buffer = NULL;
 static jack_client_t *client = NULL;
@@ -21,11 +28,9 @@ static char port_outdated = 1;
 static int
 process(jack_nframes_t nframes, void *arg)
 {
-  jack_nframes_t i = 0;
-  size_t bytes_read, bytes_to_read, space;
-  jack_midi_data_t msg[MAX_MSG_SIZE];
-  void * port_buf;
-  char midi_status;
+  void *port_buf;
+  size_t space;
+  jack_nframes_t last_frame = jack_last_frame_time(client);
 
   (void)arg;
 
@@ -35,37 +40,26 @@ process(jack_nframes_t nframes, void *arg)
 
   jack_midi_clear_buffer(port_buf);
 
-  space = jack_ringbuffer_read_space(buffer);
+  while ((space = jack_ringbuffer_read_space(buffer)) >= sizeof(MidiMessage)) {
+    MidiMessage msg;
+    size_t read;
+    int time;
 
-  while (i < nframes && space > 0) {
-    jack_ringbuffer_peek(buffer, &midi_status, 1);
+    read = jack_ringbuffer_peek(buffer, (char*)&msg, sizeof(msg));
+    if (read != sizeof(msg))
+      continue;
 
-    switch (midi_status & 0xf0) {
-    case NOTE_OFF:
-    case NOTE_ON:
-    case CTRL_CHANGE:
-      bytes_to_read = 3;
-      break;
-    case PROG_CHANGE:
-      bytes_to_read = 2;
-      break;
-    default:
-      jack_ringbuffer_read_advance(buffer, 1);
-      goto ignore;
-    }
+    /* note that msg.frame is delayed by nframes samples */
+    time = (msg.frame + nframes) - last_frame;
 
-    if (space < bytes_to_read)
-      break;
+    if (time < 0)
+      time = 0; /* potential xrun */
 
-    bytes_read = jack_ringbuffer_read(buffer, (char *) msg, bytes_to_read);
-    if (bytes_read != bytes_to_read)
-      goto ignore;
+    if (time >= (int)nframes)
+      break; /* spill over to next cycle */
 
-    jack_midi_event_write(port_buf, i, msg, bytes_read);
-
-    i++;
-ignore:
-    space = jack_ringbuffer_read_space(buffer);
+    jack_midi_event_write(port_buf, time, msg.data, msg.len);
+    jack_ringbuffer_read_advance(buffer, read);
   }
 
   return 0;
@@ -113,16 +107,30 @@ refresh_ports(void)
 }
 
 static int
-write_midi(const char *msg, size_t size)
+write_midi_at(jack_nframes_t frame, const char *msg, size_t len)
 {
   size_t avail_write = jack_ringbuffer_write_space(buffer);
+  size_t written;
+  MidiMessage payload = {
+    .frame = frame,
+    .len = len
+  };
+  memcpy(payload.data, msg, len);
 
-  if (avail_write < size)
+  if (avail_write < sizeof(payload))
     return 0; /* no space left */
-  if (jack_ringbuffer_write(buffer, msg, size) < size)
+
+  written = jack_ringbuffer_write(buffer, (const char*)&payload, sizeof(payload));
+  if (written < sizeof(payload))
     return 0; /* write failed */
 
   return 1;
+}
+
+static int
+write_midi(const char *msg, size_t len)
+{
+  return write_midi_at(jack_frame_time(client), msg, len);
 }
 
 int
@@ -146,12 +154,18 @@ write_control(char channel, char controller, char val)
 int
 write_bank_sel(char channel, uint_least16_t val)
 {
-  return write_midi(
-    (char[]) {
-      CTRL_CHANGE | channel, CTRL_BANK_SEL_MSB, (val >> 7) & 0x7f,
-      CTRL_CHANGE | channel, CTRL_BANK_SEL_LSB, val & 0x7f
-    }, 6
-  );
+  jack_nframes_t frame = jack_frame_time(client);
+  int rc1, rc2;
+
+  rc1 = write_midi_at(frame, (char[]){
+    CTRL_CHANGE | channel, CTRL_BANK_SEL_MSB, (val >> 7) & 0x7f
+  }, 3);
+
+  rc2 = write_midi_at(frame, (char[]){
+    CTRL_CHANGE | channel, CTRL_BANK_SEL_LSB, val & 0x7f
+  }, 3);
+
+  return rc1 && rc2;
 }
 
 int write_prog_change(char channel, char prog)
@@ -180,7 +194,7 @@ jack_init(int auto_connect)
   if (!out_port)
     die("can't register midi output port");
 
-  buffer = jack_ringbuffer_create(1024 * MAX_MSG_SIZE);
+  buffer = jack_ringbuffer_create(1024 * sizeof(MidiMessage));
   if (!buffer)
     die("can't create midi message buffer");
   if (jack_ringbuffer_mlock(buffer))
