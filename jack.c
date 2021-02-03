@@ -43,19 +43,36 @@ process(jack_nframes_t nframes, void *arg)
   while ((space = jack_ringbuffer_read_space(buffer)) >= sizeof(MidiMessage)) {
     MidiMessage msg;
     size_t read;
-    int time;
+    jack_nframes_t time;
 
     read = jack_ringbuffer_peek(buffer, (char*)&msg, sizeof(msg));
     if (read != sizeof(msg))
       continue;
 
-    /* note that msg.frame is delayed by nframes samples */
-    time = (msg.frame + nframes) - last_frame;
+    if (msg.frame > last_frame)
+      /* handle this in next cycle */
+      break;
 
-    if (time < 0)
-      time = 0; /* potential xrun */
+    if (last_frame - msg.frame > nframes) {
+      /* fail to process message in time
+       *
+       * |--+--------|-----------|-----------|
+       *    msg                  last_frame
+       *
+       * basically an overflow-safe way to write
+       *   (msg.frame + nframes) - last_frame < 0
+       */
+      time = 0;
+    } else {
+      /* note that msg.frame is delayed by exactly nframes samples
+       *
+       * |--+--------|-----------|
+       *    msg      last_frame
+       */
+      time = (msg.frame + nframes) - last_frame;
+    }
 
-    if (time >= (int)nframes)
+    if (time >= nframes)
       break; /* spill over to next cycle */
 
     jack_midi_event_write(port_buf, time, msg.data, msg.len);
