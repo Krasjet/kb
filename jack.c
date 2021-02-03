@@ -49,12 +49,12 @@ process(jack_nframes_t nframes, void *arg)
     if (read != sizeof(msg))
       continue;
 
-    if (msg.frame > last_frame)
-      /* handle this in next cycle */
+    if (msg.frame >= last_frame)
+      /* spill over to next cycle */
       break;
 
     if (last_frame - msg.frame > nframes) {
-      /* fail to process message in time
+      /* msg is from at least 2 cycles ago
        *
        * |--+--------|-----------|-----------|
        *    msg                  last_frame
@@ -71,9 +71,6 @@ process(jack_nframes_t nframes, void *arg)
        */
       time = (msg.frame + nframes) - last_frame;
     }
-
-    if (time >= nframes)
-      break; /* spill over to next cycle */
 
     jack_midi_event_write(port_buf, time, msg.data, msg.len);
     jack_ringbuffer_read_advance(buffer, read);
