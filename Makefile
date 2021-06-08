@@ -1,11 +1,9 @@
-.POSIX:
+include config.mk
 
-# you might need to customize the flags for your system
 PREFIX  = /usr/local
-
 CC = cc
-CFLAGS  = -Wall -Wextra -std=c99 -pedantic -Os
-LDLIBS  = -lX11 -ljack -lXi
+CFLAGS  = -Wall -Wextra -std=c99 -pedantic -Os ${JACK_CFLAGS} ${X11_CFLAGS} ${XI_CFLAGS}
+LDLIBS  = ${JACK_LDLIBS} ${X11_LDLIBS} ${XI_LDLIBS}
 LDFLAGS =
 
 OBJ = kb.o jack.o x.o util.o
